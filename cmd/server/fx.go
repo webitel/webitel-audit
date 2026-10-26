@@ -9,6 +9,7 @@ import (
 	healthfx "github.com/webitel/webitel-go-kit/infra/health/fx"
 
 	"github.com/webitel/webitel-audit/config"
+	"github.com/webitel/webitel-audit/internal/store/postgres"
 )
 
 func NewApp(cfg *config.Config) *fx.App {
@@ -32,6 +33,8 @@ func options(cfg *config.Config) fx.Option {
 		),
 
 		healthfx.Module(healthfx.Config{HTTPAddr: cfg.Health.Addr}),
+
+		postgres.Module,
 
 		healthfx.Shutdown(),
 	)
