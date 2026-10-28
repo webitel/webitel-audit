@@ -11,9 +11,10 @@ import (
 )
 
 type Config struct {
-	Service ServiceConfig `mapstructure:"service"`
-	Log     appconfig.Log `mapstructure:"log"`
-	Health  HealthConfig  `mapstructure:"health"`
+	Service  ServiceConfig      `mapstructure:"service"`
+	Log      appconfig.Log      `mapstructure:"log"`
+	Postgres appconfig.Postgres `mapstructure:"postgres"`
+	Health   HealthConfig       `mapstructure:"health"`
 }
 
 type ServiceConfig struct {
@@ -29,7 +30,7 @@ type HealthConfig struct {
 
 // LoadServerConfig loads the full configuration required by the server command.
 func LoadServerConfig() (*Config, error) {
-	loader := appconfig.NewLoader(appconfig.Sections{Log: true})
+	loader := appconfig.NewLoader(appconfig.Sections{Log: true, Postgres: true})
 	loader.RegisterFlags(pflag.CommandLine)
 	registerServiceFlags()
 	pflag.Parse()
@@ -48,12 +49,16 @@ func LoadServerConfig() (*Config, error) {
 
 // LoadMigrateConfig loads the minimal configuration required by the migrate command.
 func LoadMigrateConfig() (*Config, error) {
-	loader := appconfig.NewLoader(appconfig.Sections{Log: true})
+	loader := appconfig.NewLoader(appconfig.Sections{Log: true, Postgres: true})
 	loader.RegisterFlags(pflag.CommandLine)
 	pflag.Parse()
 
 	cfg := &Config{}
 	if err := loader.Load(pflag.CommandLine, cfg); err != nil {
+		return nil, err
+	}
+
+	if err := cfg.validateMigrate(); err != nil {
 		return nil, err
 	}
 
@@ -68,6 +73,14 @@ func registerServiceFlags() {
 func (c *Config) validate() error {
 	if c.Service.Addr == "" {
 		return errors.New("config: service.addr is required")
+	}
+
+	return c.validateMigrate()
+}
+
+func (c *Config) validateMigrate() error {
+	if c.Postgres.DSN == "" {
+		return errors.New("config: postgres.dsn is required")
 	}
 
 	if c.Log.Level == "" {
