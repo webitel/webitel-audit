@@ -112,8 +112,8 @@ github.com/webitel/webitel-go-kit/infra/pgw v0.1.0 h1:mlIpO5HeQnsSVgayCgC64JSEAh
 github.com/webitel/webitel-go-kit/infra/pgw v0.1.0/go.mod h1:qCx9C8/4jpG4BgzLNkE6yuQjGN7URfMoPxCFU1nvE4A=
 github.com/webitel/webitel-go-kit/pkg/errors v0.1.0 h1:0fQuPpEHO/Xll7R7CzarjkRbLv06g32Ltu/XY3SQRCI=
 github.com/webitel/webitel-go-kit/pkg/errors v0.1.0/go.mod h1:v6cQFLuiwx6vHJuRo+TNi7qMEg3iymI1isoG0eKLW1E=
-github.com/webitel/webitel-go-kit/pkg/logging v0.1.0 h1:v4jTtz4rMBNP0apjeJcunvLFweLEW+g71/QPO5Qm3xc=
-github.com/webitel/webitel-go-kit/pkg/logging v0.1.0/go.mod h1:pbc/NQTMSydE3VXzsYqa/WmmHnfqjPUfvQq9R4Dg5Lw=
+github.com/webitel/webitel-go-kit/pkg/logging v0.1.1 h1:bjJoLlBYfqszYFLUuOPxu6XNkpUp5k4W0DpUkvi4Gvo=
+github.com/webitel/webitel-go-kit/pkg/logging v0.1.1/go.mod h1:pbc/NQTMSydE3VXzsYqa/WmmHnfqjPUfvQq9R4Dg5Lw=
 github.com/webitel/webitel-go-kit/pkg/safemap v0.1.1-0.20260617101709-72b6b829c7ef h1:fQ7a4mqj2jXz/6AnBU6yfCxMVn7XJcTryQCwz+nAD0Y=
 github.com/webitel/webitel-go-kit/pkg/safemap v0.1.1-0.20260617101709-72b6b829c7ef/go.mod h1:0mRzFyKLNDA+WAiWPHPdURYvdCJ1nGdPELZaeuJwJxE=
 github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 h1:gEOO8jv9F4OT7lGCjxCBTO/36wtF6j2nSip77qHd4x4=

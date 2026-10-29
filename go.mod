@@ -15,7 +15,7 @@ require (
 	github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99
 	github.com/webitel/webitel-go-kit/infra/pgw v0.1.0
 	github.com/webitel/webitel-go-kit/pkg/errors v0.1.0
-	github.com/webitel/webitel-go-kit/pkg/logging v0.1.0
+	github.com/webitel/webitel-go-kit/pkg/logging v0.1.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.21.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/sdk v1.47.0
