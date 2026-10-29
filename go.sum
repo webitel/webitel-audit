@@ -104,8 +104,8 @@ github.com/webitel/webitel-go-kit/infra/discovery v0.0.0-20261019102208-fa755b72
 github.com/webitel/webitel-go-kit/infra/discovery v0.0.0-20261019102208-fa755b72ff99/go.mod h1:IhUZHd7EYD1pCoX9dNNlkpF+/c3Q6ODgBcluGDMbJrU=
 github.com/webitel/webitel-go-kit/infra/health v0.2.0 h1:aIhAz9LCp42neoeiwq7sR56QvuUCnRudlgvwszzg9qo=
 github.com/webitel/webitel-go-kit/infra/health v0.2.0/go.mod h1:qumOZfpiFfBSIxGd3CMiEyiNKY4xNaVpUh6nlnTgoPk=
-github.com/webitel/webitel-go-kit/infra/health/fx v0.0.0-20261019102208-fa755b72ff99 h1:wlvht2fzEhR7+ESoESBH8/igjPp4126yJ4PYcQ5qk6E=
-github.com/webitel/webitel-go-kit/infra/health/fx v0.0.0-20261019102208-fa755b72ff99/go.mod h1:13ea4gkmeS6xAOqHotMxkKorBfTEPAWPx7kWxGsQaJ0=
+github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0 h1:uOUsvzomDYzrutVe1GJKWgCIfb0M3ddzaA9rd0cvCdk=
+github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0/go.mod h1:13ea4gkmeS6xAOqHotMxkKorBfTEPAWPx7kWxGsQaJ0=
 github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99 h1:WlBJTlHfPzTL1NBB+PdzxS3FOerWbn4QKzsD1Bm7OnE=
 github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99/go.mod h1:x8JamaSxA0akXEWNctUCdxGRrkyMqhNkbffhOCobmSw=
 github.com/webitel/webitel-go-kit/infra/pgw v0.1.0 h1:mlIpO5HeQnsSVgayCgC64JSEAh70ZGs5Y2kciEIhXXI=
