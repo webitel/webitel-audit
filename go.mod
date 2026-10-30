@@ -12,6 +12,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/webitel/webitel-go-kit/appconfig v0.1.0
 	github.com/webitel/webitel-go-kit/infra/discovery v0.0.0-20261023102238-4cb4c8025f0d
+	github.com/webitel/webitel-go-kit/infra/discovery/fx v0.1.0
 	github.com/webitel/webitel-go-kit/infra/health v0.3.0
 	github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0
 	github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99
@@ -34,21 +35,34 @@ require (
 	cel.dev/cel-go v0.32.0 // indirect
 	cel.dev/expr v0.25.3 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
+	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0 // indirect
+	github.com/hashicorp/consul/api v1.33.2 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-hclog v1.5.0 // indirect
+	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
+	github.com/hashicorp/golang-lru v1.0.2 // indirect
+	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.23 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

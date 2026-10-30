@@ -12,8 +12,8 @@ import (
 	"github.com/webitel/webitel-audit/config"
 )
 
-// stopTimeout bounds the graceful shutdown; it exceeds the health drain hold.
-const stopTimeout = 30 * time.Second
+// stopTimeout bounds the graceful shutdown: health drain (up to 20s), Deregister and gRPC GracefulStop (10s).
+const stopTimeout = 45 * time.Second
 
 func CMD() *cli.Command {
 	return &cli.Command{
@@ -35,7 +35,7 @@ func CMD() *cli.Command {
 			app := NewApp(cfg)
 
 			// Listen before Start so a signal during startup is not fatal. Start gets its own context:
-			// fx rollback with a cancelled one skips the stop hooks.
+			// fx rollback with a canceled one skips the stop hooks.
 			ctx, stop := signal.NotifyContext(c.Context, syscall.SIGINT, syscall.SIGTERM)
 			defer stop()
 
