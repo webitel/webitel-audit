@@ -59,6 +59,7 @@ func up(ctx context.Context, cfg *config.Config, log *slog.Logger) error {
 	}
 
 	db := stdlib.OpenDB(*poolConfig.ConnConfig)
+
 	defer func() { _ = db.Close() }()
 
 	locker, err := lock.NewPostgresSessionLocker(lock.WithLockID(lockID))
