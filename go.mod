@@ -13,7 +13,7 @@ require (
 	github.com/webitel/webitel-go-kit/appconfig v0.1.0
 	github.com/webitel/webitel-go-kit/infra/discovery v0.0.0-20261023102238-4cb4c8025f0d
 	github.com/webitel/webitel-go-kit/infra/discovery/fx v0.1.0
-	github.com/webitel/webitel-go-kit/infra/health v0.3.0
+	github.com/webitel/webitel-go-kit/infra/health v0.4.0
 	github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0
 	github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99
 	github.com/webitel/webitel-go-kit/infra/pgw v0.1.0
