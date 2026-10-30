@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	buf.build/go/protovalidate v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
-	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jackc/pgx/v5 v5.11.0
 	github.com/pressly/goose/v3 v3.27.3
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.12.1
