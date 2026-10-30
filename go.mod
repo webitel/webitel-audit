@@ -8,7 +8,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v2 v2.27.7
-	github.com/webitel/webitel-go-kit/appconfig v0.0.0-20261019102208-fa755b72ff99
+	github.com/webitel/webitel-go-kit/appconfig v0.1.0
 	github.com/webitel/webitel-go-kit/infra/discovery v0.0.0-20261019102208-fa755b72ff99
 	github.com/webitel/webitel-go-kit/infra/health v0.2.0
 	github.com/webitel/webitel-go-kit/infra/health/fx v0.0.0-20261019102208-fa755b72ff99
