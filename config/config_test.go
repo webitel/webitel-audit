@@ -12,6 +12,7 @@ import (
 func validConfig() *Config {
 	return &Config{
 		Service:  ServiceConfig{Addr: "127.0.0.1:8080"},
+		Consul:   appconfig.Consul{Addr: "127.0.0.1:8500"},
 		Postgres: appconfig.Postgres{DSN: "postgres://127.0.0.1:5432/webitel"},
 	}
 }
@@ -37,6 +38,44 @@ func TestConfigValidate(t *testing.T) {
 
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "service.addr")
+	})
+
+	t.Run("rejects wildcard service addr", func(t *testing.T) {
+		for _, addr := range []string{":8080", "0.0.0.0:8080", "[::]:8080", "no-port"} {
+			cfg := validConfig()
+			cfg.Service.Addr = addr
+
+			assert.Error(t, cfg.validate(), addr)
+		}
+	})
+
+	t.Run("rejects service addr without a usable port", func(t *testing.T) {
+		for _, addr := range []string{"10.0.0.5:", "10.0.0.5:0", "10.0.0.5:http", "10.0.0.5:70000"} {
+			cfg := validConfig()
+			cfg.Service.Addr = addr
+
+			assert.Error(t, cfg.validate(), addr)
+		}
+	})
+
+	t.Run("requires consul addr", func(t *testing.T) {
+		cfg := validConfig()
+		cfg.Consul.Addr = ""
+
+		err := cfg.validate()
+
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "consul.addr")
+	})
+
+	t.Run("verified certs need cert paths", func(t *testing.T) {
+		cfg := validConfig()
+		cfg.Service.Connection.VerifyCerts = true
+
+		require.Error(t, cfg.validate())
+
+		cfg.Service.Connection.CA, cfg.Service.Connection.Cert, cfg.Service.Connection.Key = "ca", "cert", "key"
+		require.NoError(t, cfg.validate())
 	})
 
 	t.Run("requires postgres dsn", func(t *testing.T) {

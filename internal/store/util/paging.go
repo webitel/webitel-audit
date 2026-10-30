@@ -3,7 +3,7 @@ package util
 import "math"
 
 const (
-	DefaultPageSize = 10 //applies when the request has no positive size.
+	DefaultPageSize = 10 // applies when the request has no positive size.
 
 	MaxPageSize = 5000 // caps the requested size (matches webitel-kb).
 

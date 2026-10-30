@@ -1,7 +1,7 @@
 # webitel-audit
 
 Audit service of the Webitel platform. Built on the shared go-kit
-(`appconfig`, `infra/health`, `infra/otel`, `infra/pgw`) and wired with
+(`appconfig`, `infra/discovery`, `infra/health`, `infra/otel`, `infra/pgw`, `infra/transport`) and wired with
 [fx](https://github.com/uber-go/fx).
 
 ## Run
@@ -19,7 +19,10 @@ validated on start; an invalid one stops the service.
 
 | Env | Default | Description |
 |---|---|---|
-| `SERVICE_ADDR` | `127.0.0.1:8080` | gRPC listen address (not used until the gRPC server arrives) |
+| `SERVICE_ADDR` | `127.0.0.1:8080` | gRPC listen address |
+| `SERVICE_CONN_VERIFY_CERTS` | `true` | gRPC TLS; needs `SERVICE_CONN_CA`, `_CERT` and `_KEY`. Set `false` locally |
+| `SERVICE_CONN_MTLS` | `true` | require client certificates (with verified certs) |
+| `CONSUL_ADDR` | `localhost:8500` | Consul agent the service registers in |
 | `HEALTH_ADDR` | not set | listen address of `/livez`, `/readyz`, `/healthz`; unset disables the probes |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 | `LOG_JSON` | `false` | JSON console output |
