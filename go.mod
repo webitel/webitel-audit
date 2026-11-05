@@ -15,7 +15,7 @@ require (
 	github.com/webitel/webitel-go-kit/infra/discovery/fx v0.1.0
 	github.com/webitel/webitel-go-kit/infra/health v0.3.0
 	github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0
-	github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99
+	github.com/webitel/webitel-go-kit/infra/otel v0.7.1
 	github.com/webitel/webitel-go-kit/infra/pgw v0.1.0
 	github.com/webitel/webitel-go-kit/infra/transport v0.1.0
 	github.com/webitel/webitel-go-kit/pkg/errors v0.1.0
@@ -83,6 +83,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.72.0 // indirect
+	go.opentelemetry.io/contrib/processors/baggagecopy v0.17.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.23.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.23.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.47.0 // indirect
