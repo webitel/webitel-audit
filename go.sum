@@ -271,8 +271,8 @@ github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0 h1:uOUsvzomDYzrutVe1GJK
 github.com/webitel/webitel-go-kit/infra/health/fx v0.2.0/go.mod h1:13ea4gkmeS6xAOqHotMxkKorBfTEPAWPx7kWxGsQaJ0=
 github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99 h1:WlBJTlHfPzTL1NBB+PdzxS3FOerWbn4QKzsD1Bm7OnE=
 github.com/webitel/webitel-go-kit/infra/otel v0.3.3-0.20261019102208-fa755b72ff99/go.mod h1:x8JamaSxA0akXEWNctUCdxGRrkyMqhNkbffhOCobmSw=
-github.com/webitel/webitel-go-kit/infra/pgw v0.1.0 h1:mlIpO5HeQnsSVgayCgC64JSEAh70ZGs5Y2kciEIhXXI=
-github.com/webitel/webitel-go-kit/infra/pgw v0.1.0/go.mod h1:qCx9C8/4jpG4BgzLNkE6yuQjGN7URfMoPxCFU1nvE4A=
+github.com/webitel/webitel-go-kit/infra/pgw v1.0.0 h1:QHbIWSpCTDsxdquqmcnyAHWGF0idZRjOim9Z9KZ/gFo=
+github.com/webitel/webitel-go-kit/infra/pgw v1.0.0/go.mod h1:qCx9C8/4jpG4BgzLNkE6yuQjGN7URfMoPxCFU1nvE4A=
 github.com/webitel/webitel-go-kit/infra/transport v0.1.0 h1:D1NDqrBYSH07STCoF4fZDt46Dh65JYB6t4T/+GpzzBQ=
 github.com/webitel/webitel-go-kit/infra/transport v0.1.0/go.mod h1:ZmjHHOnxe2vVSUHW3yVx/9++EeTd9Wui5mSd7xngfvc=
 github.com/webitel/webitel-go-kit/pkg/errors v0.1.0 h1:0fQuPpEHO/Xll7R7CzarjkRbLv06g32Ltu/XY3SQRCI=
