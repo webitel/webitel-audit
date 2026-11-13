@@ -9,10 +9,14 @@ import (
 
 	discoveryfx "github.com/webitel/webitel-go-kit/infra/discovery/fx"
 	healthfx "github.com/webitel/webitel-go-kit/infra/health/fx"
+	authfx "github.com/webitel/webitel-go-kit/infra/webitel/auth/fx"
 
 	"github.com/webitel/webitel-audit/config"
+	auditv1 "github.com/webitel/webitel-audit/gen/go/audit/v1"
 	grpcserver "github.com/webitel/webitel-audit/infra/server/grpc"
+	grpchandler "github.com/webitel/webitel-audit/internal/handler/grpc"
 	"github.com/webitel/webitel-audit/internal/model"
+	"github.com/webitel/webitel-audit/internal/service"
 	"github.com/webitel/webitel-audit/internal/store/postgres"
 )
 
@@ -39,14 +43,16 @@ func options(cfg *config.Config) fx.Option {
 		healthfx.Module(healthfx.Config{HTTPAddr: cfg.Health.Addr}),
 
 		postgres.Module,
+		service.Module,
 
 		serving(cfg),
+		grpchandler.Module,
 
 		healthfx.Shutdown(),
 	)
 }
 
-// serving declares the gRPC server before discovery, so fx stops them in reverse and Deregister runs before GracefulStop.
+// serving wires the gRPC server, discovery and auth;
 func serving(cfg *config.Config) fx.Option {
 	return fx.Options(
 		grpcserver.Module,
@@ -57,5 +63,6 @@ func serving(cfg *config.Config) fx.Option {
 			Endpoints: []string{(&url.URL{Scheme: "grpc", Host: cfg.Service.Addr}).String()},
 			Metadata:  map[string]string{"commit": model.Commit},
 		}),
+		authfx.Module(authfx.Config{}, auditv1.WebitelAPI),
 	)
 }

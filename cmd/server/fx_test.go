@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/webitel/webitel-go-kit/infra/health"
 	healthfx "github.com/webitel/webitel-go-kit/infra/health/fx"
 
 	"github.com/webitel/webitel-audit/config"
@@ -34,7 +35,8 @@ func TestGraphIsValid(t *testing.T) {
 	require.NoError(t, fx.ValidateApp(options(cfg)))
 }
 
-// TestShutdownOrder checks that the instance leaves Consul while the gRPC server still serves.
+// TestShutdownOrder: health drain while the gRPC server still serves, then GracefulStop, then Deregister
+// (the server takes the authorizer, built from discovery). The TTL heartbeat itself is go-kit's, not tested here.
 func TestShutdownOrder(t *testing.T) {
 	var (
 		mu           sync.Mutex
@@ -50,8 +52,22 @@ func TestShutdownOrder(t *testing.T) {
 		registered         bool
 		statusAtDeregister healthpb.HealthCheckResponse_ServingStatus
 		deregistered       bool
+		readyAtDrainEnd    = true
+		statusAtDrainEnd   healthpb.HealthCheckResponse_ServingStatus
 		conn               *grpc.ClientConn
 	)
+
+	grpcStatus := func() healthpb.HealthCheckResponse_ServingStatus {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+
+		resp, err := healthpb.NewHealthClient(conn).Check(ctx, &healthpb.HealthCheckRequest{})
+		if err != nil {
+			return -1
+		}
+
+		return resp.GetStatus()
+	}
 
 	consul := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()
@@ -66,16 +82,7 @@ func TestShutdownOrder(t *testing.T) {
 			registered = json.NewDecoder(r.Body).Decode(&registration) == nil
 		case strings.HasPrefix(r.URL.Path, "/v1/agent/service/deregister/"):
 			deregistered = true
-
-			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-			defer cancel()
-
-			resp, err := healthpb.NewHealthClient(conn).Check(ctx, &healthpb.HealthCheckRequest{})
-			if err == nil {
-				statusAtDeregister = resp.GetStatus()
-			} else {
-				statusAtDeregister = -1
-			}
+			statusAtDeregister = grpcStatus()
 		}
 
 		_, _ = io.WriteString(w, "{}")
@@ -99,6 +106,19 @@ func TestShutdownOrder(t *testing.T) {
 		fx.Provide(func() *slog.Logger { return slog.New(slog.NewTextHandler(io.Discard, nil)) }),
 		healthfx.Module(healthfx.Config{DrainHold: 50 * time.Millisecond}),
 		serving(cfg),
+		// Appended after the server and before healthfx.Shutdown, so it stops right after the drain, before GracefulStop.
+		fx.Invoke(func(lc fx.Lifecycle, h *health.Registry) {
+			lc.Append(fx.Hook{OnStop: func(context.Context) error {
+				ready, _ := h.ReadyFunc()()
+
+				mu.Lock()
+				defer mu.Unlock()
+
+				readyAtDrainEnd, statusAtDrainEnd = ready, grpcStatus()
+
+				return nil
+			}})
+		}),
 		healthfx.Shutdown(),
 	)
 
@@ -126,6 +146,8 @@ func TestShutdownOrder(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	assert.False(t, readyAtDrainEnd, "the drain reports not ready")
+	assert.Equal(t, healthpb.HealthCheckResponse_SERVING, statusAtDrainEnd, "the drain runs before GracefulStop")
 	require.True(t, deregistered, "deregistered from Consul on stop")
-	assert.Equal(t, healthpb.HealthCheckResponse_SERVING, statusAtDeregister, "server still serving at Deregister")
+	assert.Equal(t, healthpb.HealthCheckResponse_ServingStatus(-1), statusAtDeregister, "Deregister runs after GracefulStop")
 }
