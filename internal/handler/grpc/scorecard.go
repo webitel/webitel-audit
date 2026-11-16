@@ -220,7 +220,7 @@ func searchFromProto(req *auditv1.SearchScorecardsRequest) (*store.ScorecardSear
 	}
 
 	for _, t := range req.GetInteractionType() {
-		out.InteractionTypes = append(out.InteractionTypes, model.InteractionType(t))
+		out.InteractionTypes = append(out.InteractionTypes, model.InteractionType(toInt16(int32(t))))
 	}
 
 	return out, nil
@@ -233,7 +233,7 @@ func scorecardFromProto(
 	out := &model.Scorecard{Name: name, Description: description, Enabled: enabled, Archive: archive}
 
 	for _, t := range types {
-		out.InteractionTypes = append(out.InteractionTypes, model.InteractionType(t))
+		out.InteractionTypes = append(out.InteractionTypes, model.InteractionType(toInt16(int32(t))))
 	}
 
 	for _, t := range teams {
@@ -297,7 +297,7 @@ func criterionFromProto(q *auditv1.Criterion, groupKeys map[string]uuid.UUID) (m
 	}
 
 	out := model.Criterion{
-		ID: id, GroupID: groupID, Position: toInt16(q.GetPosition()), Type: model.CriterionType(q.GetType()),
+		ID: id, GroupID: groupID, Position: toInt16(q.GetPosition()), Type: model.CriterionType(toInt16(int32(q.GetType()))),
 		Question: q.GetText(), Description: q.GetDescription(), Required: q.GetRequired(),
 		CriticalViolation: q.GetCriticalViolation(), AllowNA: q.GetAllowNa(),
 		Min: toInt16(q.GetMin()), Max: toInt16(q.GetMax()), Weight: q.GetWeight(),

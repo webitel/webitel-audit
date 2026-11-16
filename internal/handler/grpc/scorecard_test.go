@@ -332,3 +332,18 @@ func TestClientIDTakesOnlyCanonicalUUIDs(t *testing.T) {
 		assert.True(t, temp, key)
 	}
 }
+
+// An enum number outside int16 must not wrap into a valid value (65537 would become 1, the call type): it is clamped
+// and model validation refuses it.
+func TestEnumNumbersDoNotWrapAround(t *testing.T) {
+	got, err := scorecardFromProto("Quality", "", false, false,
+		[]auditv1.InteractionType{auditv1.InteractionType(65537)}, nil, nil,
+		[]*auditv1.Criterion{{Type: auditv1.CriterionType(65539)}})
+	require.NoError(t, err)
+
+	assert.Equal(t, []model.InteractionType{math.MaxInt16}, got.InteractionTypes)
+	assert.Equal(t, model.CriterionType(math.MaxInt16), got.Criteria[0].Type)
+
+	got.Normalize()
+	require.Error(t, got.Validate())
+}
