@@ -10,10 +10,11 @@ import (
 
 	"github.com/webitel/webitel-audit/config"
 	"github.com/webitel/webitel-audit/internal/model"
+	"github.com/webitel/webitel-audit/internal/store"
 )
 
 var Module = fx.Module("postgres",
-	fx.Provide(ProvidePoolManager),
+	fx.Provide(ProvidePoolManager, fx.Annotate(NewScorecardStore, fx.As(new(store.ScorecardStore)))),
 	fx.Invoke(registerHealth),
 )
 

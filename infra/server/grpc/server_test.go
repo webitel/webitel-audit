@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	authmw "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx/fxtest"
@@ -20,9 +21,11 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/webitel/webitel-go-kit/infra/webitel/auth"
 	"github.com/webitel/webitel-go-kit/pkg/errors"
 
 	"github.com/webitel/webitel-audit/config"
+	auditv1 "github.com/webitel/webitel-audit/gen/go/audit/v1"
 	"github.com/webitel/webitel-audit/internal/model"
 )
 
@@ -31,6 +34,23 @@ func testConfig() *config.Config {
 }
 
 func discardLog() *slog.Logger { return slog.New(slog.NewTextHandler(io.Discard, nil)) }
+
+// allowAll lets every call through auth.
+func allowAll(ctx context.Context) (context.Context, error) { return ctx, nil }
+
+// realAuth is the go-kit authorizer of the ScorecardService map; the tests send no token, so it never calls UserInfo.
+func realAuth(t *testing.T) authmw.AuthFunc {
+	t.Helper()
+
+	client := auth.New(nil)
+
+	t.Cleanup(func() { _ = client.Close() })
+
+	authorizer, err := auth.NewAuthorizer(client, auditv1.WebitelAPI)
+	require.NoError(t, err)
+
+	return authorizer.Authorize
+}
 
 // unary builds a handler that runs the interceptor chain and then fn.
 func unary(method string, fn func() error) func(any, context.Context, func(any) error, grpc.UnaryServerInterceptor) (any, error) {
@@ -52,13 +72,15 @@ func unary(method string, fn func() error) func(any, context.Context, func(any) 
 	}
 }
 
-// startServer returns a started server and a client connected to it.
-func startServer(t *testing.T) (*Server, *fxtest.Lifecycle, *grpc.ClientConn) {
+// startServer returns a started server with authorize and a client connected to it.
+func startServer(t *testing.T, authorize authmw.AuthFunc) (*Server, *fxtest.Lifecycle, *grpc.ClientConn) {
 	t.Helper()
 
 	lc := fxtest.NewLifecycle(t)
-	s, err := New(testConfig(), discardLog(), lc)
+	s, err := New(testConfig(), discardLog(), lc, authorize)
 	require.NoError(t, err)
+
+	auditv1.RegisterScorecardServiceServer(s, auditv1.UnimplementedScorecardServiceServer{})
 
 	s.RegisterService(&grpc.ServiceDesc{
 		ServiceName: "test.Svc",
@@ -67,6 +89,9 @@ func startServer(t *testing.T) (*Server, *fxtest.Lifecycle, *grpc.ClientConn) {
 			{MethodName: "Panic", Handler: unary("/test.Svc/Panic", func() error { panic("boom") })},
 			{MethodName: "NotFound", Handler: unary("/test.Svc/NotFound", func() error { return errors.NotFound("no such entity") })},
 			{MethodName: "Echo", Handler: unary("/test.Svc/Echo", func() error { return nil })},
+		},
+		Streams: []grpc.StreamDesc{
+			{StreamName: "Stream", ServerStreams: true, Handler: func(any, grpc.ServerStream) error { return nil }},
 		},
 	}, struct{}{})
 
@@ -80,7 +105,7 @@ func startServer(t *testing.T) (*Server, *fxtest.Lifecycle, *grpc.ClientConn) {
 }
 
 func TestHealthAndReflection(t *testing.T) {
-	_, _, conn := startServer(t)
+	_, _, conn := startServer(t, allowAll)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -111,7 +136,7 @@ func TestHealthAndReflection(t *testing.T) {
 
 func TestNotServingBeforeStart(t *testing.T) {
 	lc := fxtest.NewLifecycle(t)
-	s, err := New(testConfig(), discardLog(), lc)
+	s, err := New(testConfig(), discardLog(), lc, allowAll)
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = s.listener.Close() })
 
@@ -141,7 +166,7 @@ func gatewayError(t *testing.T, err error) (id string, code int, detail string) 
 }
 
 func TestPanicIsRecovered(t *testing.T) {
-	_, _, conn := startServer(t)
+	_, _, conn := startServer(t, allowAll)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -159,7 +184,7 @@ func TestPanicIsRecovered(t *testing.T) {
 }
 
 func TestHandlerErrorIsGatewayJSON(t *testing.T) {
-	_, _, conn := startServer(t)
+	_, _, conn := startServer(t, allowAll)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -174,7 +199,7 @@ func TestHandlerErrorIsGatewayJSON(t *testing.T) {
 }
 
 func TestStopMarksNotServingAndForcesStuckWatch(t *testing.T) {
-	s, lc, conn := startServer(t)
+	s, lc, conn := startServer(t, allowAll)
 	s.stopTimeout = 200 * time.Millisecond
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -194,13 +219,49 @@ func TestStopMarksNotServingAndForcesStuckWatch(t *testing.T) {
 	assert.Equal(t, healthpb.HealthCheckResponse_NOT_SERVING, next.GetStatus())
 }
 
+// TestScorecardServiceNeedsAuth: the API service goes through the authorizer, health stays open without a token.
+func TestScorecardServiceNeedsAuth(t *testing.T) {
+	_, _, conn := startServer(t, realAuth(t))
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := auditv1.NewScorecardServiceClient(conn).ReadScorecard(ctx, &auditv1.ReadScorecardRequest{Id: 1})
+	assert.Equal(t, codes.Unauthenticated, status.Code(err), "no token")
+
+	resp, err := healthpb.NewHealthClient(conn).Check(ctx, &healthpb.HealthCheckRequest{})
+	require.NoError(t, err)
+	assert.Equal(t, healthpb.HealthCheckResponse_SERVING, resp.GetStatus())
+}
+
+// TestStreamNeedsAuth: a stream RPC without a token never reaches its handler (which would end it OK);
+// the authorizer refuses a method outside WebitelAPI first. Health Watch stays open.
+func TestStreamNeedsAuth(t *testing.T) {
+	_, _, conn := startServer(t, realAuth(t))
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	stream, err := conn.NewStream(ctx, &grpc.StreamDesc{ServerStreams: true}, "/test.Svc/Stream")
+	require.NoError(t, err)
+	require.NoError(t, stream.SendMsg(&emptypb.Empty{}))
+	require.NoError(t, stream.CloseSend())
+	assert.Equal(t, codes.PermissionDenied, status.Code(stream.RecvMsg(&emptypb.Empty{})))
+
+	watch, err := healthpb.NewHealthClient(conn).Watch(ctx, &healthpb.HealthCheckRequest{})
+	require.NoError(t, err)
+	resp, err := watch.Recv()
+	require.NoError(t, err)
+	assert.Equal(t, healthpb.HealthCheckResponse_SERVING, resp.GetStatus())
+}
+
 func TestNewFailsOnBrokenTLS(t *testing.T) {
 	cfg := testConfig()
 	cfg.Service.Connection.VerifyCerts = true
 	cfg.Service.Connection.Cert = "missing.pem"
 	cfg.Service.Connection.Key = "missing.key"
 
-	_, err := New(cfg, discardLog(), fxtest.NewLifecycle(t))
+	_, err := New(cfg, discardLog(), fxtest.NewLifecycle(t), allowAll)
 
 	require.Error(t, err)
 }
